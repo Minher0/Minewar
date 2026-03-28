@@ -192,3 +192,33 @@ Use 'kill 670' to stop it.
 ✓ Compiled in 207ms
 ⚠ Cross origin request detected from preview-chat-6c2c02dc-0c72-4a0b-8ee2-1ab922b7fe35.space.z.ai to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
 Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+ GET / 200 in 116ms (compile: 34ms, render: 82ms)
+ GET / 200 in 65ms (compile: 33ms, render: 32ms)
+ GET / 200 in 13ms (compile: 2ms, render: 11ms)
+ GET / 200 in 12ms (compile: 1759µs, render: 11ms)
+ GET / 200 in 19ms (compile: 3ms, render: 16ms)
+ GET / 200 in 19ms (compile: 2ms, render: 17ms)
+ GET / 200 in 16ms (compile: 2ms, render: 14ms)
+ GET / 200 in 16ms (compile: 2ms, render: 14ms)
+ GET / 200 in 21ms (compile: 3ms, render: 18ms)
+ GET / 200 in 12ms (compile: 1800µs, render: 10ms)
+ GET / 200 in 12ms (compile: 1991µs, render: 10ms)
+ GET / 200 in 13ms (compile: 1539µs, render: 12ms)
+ GET / 200 in 12ms (compile: 1871µs, render: 10ms)
+ GET / 200 in 16ms (compile: 1701µs, render: 14ms)
+ GET / 200 in 12ms (compile: 1731µs, render: 10ms)
+ GET / 200 in 13ms (compile: 1865µs, render: 11ms)
+ GET / 200 in 11ms (compile: 1497µs, render: 10ms)
+ GET / 200 in 16ms (compile: 1519µs, render: 14ms)
+ GET / 200 in 12ms (compile: 1462µs, render: 11ms)
+✓ Compiled in 139ms
+✓ Compiled in 129ms
+ GET / 200 in 45ms (compile: 29ms, render: 16ms)
+✓ Compiled in 116ms
+ GET / 200 in 57ms (compile: 37ms, render: 19ms)
+ GET / 200 in 95ms (compile: 2ms, render: 93ms)
+✓ Compiled in 201ms
+✓ Compiled in 136ms
+ GET / 200 in 53ms (compile: 34ms, render: 18ms)
+ GET / 200 in 89ms (compile: 3ms, render: 86ms)
+✓ Compiled in 136ms
