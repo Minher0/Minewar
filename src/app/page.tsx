@@ -129,9 +129,7 @@ export default function Home() {
             <Card className="group bg-gradient-to-br from-[#1a1a2e] to-[#16213e] border-2 border-[#1bd96a]/30 hover:border-[#1bd96a] transition-all duration-300 hover:shadow-lg hover:shadow-[#1bd96a]/20 cursor-pointer">
               <CardContent className="p-0">
                 <a 
-                  href="https://download1583.mediafire.com/0lmidg93vd9g1zfiDt2D1LG5NZqcJ0Pn4KwK9gf_CwBJ37YWJPVyqXwx4xcR2MNkfWaZ0bvHX29kDKdwTLIxAIaevDVF9KRhdhM8z8T3fhybtHWOwwlGDBhpyWbLUdrWiyrfTV2tgYmyblKxD3JYputSkWenX1LxMs3xa5a6bW7hlw/y0uit2qk59hqqvm/MineWar+1.0.0.mrpack"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="/api/download/modrinth"
                   className="flex items-center gap-4 p-6"
                 >
                   <div className="w-16 h-16 rounded-xl bg-[#1bd96a]/20 flex items-center justify-center group-hover:bg-[#1bd96a]/30 transition-colors">
@@ -157,9 +155,7 @@ export default function Home() {
             <Card className="group bg-gradient-to-br from-[#1a1a2e] to-[#16213e] border-2 border-[#f16436]/30 hover:border-[#f16436] transition-all duration-300 hover:shadow-lg hover:shadow-[#f16436]/20 cursor-pointer">
               <CardContent className="p-0">
                 <a 
-                  href="https://download944.mediafire.com/fypr8pue42kgQG1S8djndvdVi0UK4ZBRVr0DHjDsuMDqvwGh8jfdL7RtU_wQ3zphpdcltHUQxiSyN4r_j6k4HKdvYiw7halha5qQcoqubq4bTL2RzfgQwOuWTU368F82FnFUNccTSyazAg0cUFvC1j1xYicFZgRfZGhHGzkv909mqg/s87megu7nauejf1/Minewar.zip"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="/api/download/curseforge"
                   className="flex items-center gap-4 p-6"
                 >
                   <div className="w-16 h-16 rounded-xl bg-[#f16436]/20 flex items-center justify-center group-hover:bg-[#f16436]/30 transition-colors">
