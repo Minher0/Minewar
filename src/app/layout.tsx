@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "MineWar - Serveur Minecraft Fabric 1.20.1",
-  description: "MineWar - Serveur Minecraft Fabric 1.20.1 entre potes. Rejoins-nous sur minewar.ddns.net ! Site: minewar.vercel.app",
+  description: "MineWar - Serveur Minecraft Fabric 1.20.1. Un NationGlory mais c'est que entre nous ! Site: minewar.vercel.app",
   keywords: ["MineWar", "Minecraft", "Fabric", "1.20.1", "Serveur", "Server", "Multiplayer", "PVP"],
   authors: [{ name: "MineWar Team" }],
   icons: {
