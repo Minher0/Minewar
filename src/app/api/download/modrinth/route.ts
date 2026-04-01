@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-const MODRINTH_URL = 'https://download1351.mediafire.com/o55gxycwifmgVWAlXf5PVTwPkt9biLrTgtFRiPshuPKIfd0_P_fWEbVHkhmIpo3j6JWN21PyoqtXEdti_2RFNmlM5KpHvIoc0OVUO8N4FeSvK05K9zHjIltm6qlpou_BBTk06HlffiCiI_6fFIYSNQVDGGl0GQ_NtNPxs0atg22zhg/cuv942u8lguhlrc/MineWar+1.0.0.mrpack'
+const MODRINTH_URL = 'https://download1351.mediafire.com/ru162rhp4atg99M275APtoGudoXPDAqcGLU3K6IkxcLkdJSQemCg3aUoKU6U30geEhtZgv_KP5IlgeS80jRpH5sNCv0H_aerDr3LC9keVeeYk9ZFEwEri0y4725_PD9ELSNS2qWKIiKEliBwQS2KF7cff8qLA9qfAmlcP2GIkw/cuv942u8lguhlrc/MineWar+1.0.0.mrpack'
 
 export async function GET() {
   try {

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-const CURSEFORGE_URL = 'https://download1478.mediafire.com/hugauk3rrmqgot3c8tfaUefUjPWImsbCtqPGx3M7I4t_hr5Ii1UZNmQCsy-uZYka4NFxKqEIwH9n7tbw4td9OYbBs2qgnHL3XaplP-bvX59-rLW4OVa0drLuWoH6xfr8gtCgkORL_gNhfDwjrr-tPsfv70Iz2HfEYqKYPvuQ3T0hpQ/e7c0yrv283eu6hd/MineWar.zip'
+const CURSEFORGE_URL = 'https://download1478.mediafire.com/worqu87q3rdglcrgTm1T5G9roTdmZHnyUWYmgnbjwFExo6cgnOM2179ACuQPELO6nAavH_7yRstfArDTrhgMCQs56p5orsr_sg3qqTmCun1KgbDr81-bZm-KVgq5fC6unKqQWuKBnSH7aJdk7-6Jt9mVREx24J26_tekeWICWaO1/e7c0yrv283eu6hd/MineWar.zip'
 
 export async function GET() {
   try {
