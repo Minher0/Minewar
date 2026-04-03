@@ -5,5 +5,20 @@
     "modrinthUrl": "https://github.com/Minher0/Minewar/releases/latest/download/MineWar.1.0.0.mrpack",
     "curseforgeUrl": "https://github.com/Minher0/Minewar/releases/latest/download/MineWar.zip"
   },
-  "news": []
+  "news": [
+    {
+      "id": "lln02z0q42k",
+      "title": "test 2",
+      "content": "here",
+      "createdAt": "2026-04-03T22:08:31.582Z",
+      "updatedAt": "2026-04-03T22:08:31.582Z"
+    },
+    {
+      "id": "zdpvl881jhc",
+      "title": "Test",
+      "content": "test",
+      "createdAt": "2026-04-03T21:50:23.344Z",
+      "updatedAt": "2026-04-03T21:50:23.344Z"
+    }
+  ]
 }
