@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useSession, signIn, signOut } from 'next-auth/react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { Input } from '@/components/ui/input'
@@ -15,8 +15,8 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import { toast } from '@/hooks/use-toast'
 import { 
-  Copy, Check, Users, Activity, Shield, Plus, Pencil, Trash2, 
-  Settings, LogOut, Github, X, ChevronDown, ChevronUp
+  Copy, Check, Users, Activity, Shield, Pencil, Trash2, 
+  Settings, LogOut, Github, X, ChevronDown, ChevronUp, RotateCcw, Download
 } from 'lucide-react'
 
 // Types
@@ -46,7 +46,17 @@ interface SiteConfig {
   id: string
   serverIP: string
   discordUrl: string
+  modrinthUrl: string
+  curseforgeUrl: string
   updatedAt: string
+}
+
+// Default config for reset
+const DEFAULT_CONFIG = {
+  serverIP: 'minewar.ddns.net',
+  discordUrl: 'https://discord.gg/xHUGYn7ErC',
+  modrinthUrl: 'https://github.com/Minher0/Minewar/releases/latest/download/MineWar.1.0.0.mrpack',
+  curseforgeUrl: 'https://github.com/Minher0/Minewar/releases/latest/download/MineWar.zip'
 }
 
 export default function Home() {
@@ -61,10 +71,15 @@ export default function Home() {
   // Edit states
   const [editingNews, setEditingNews] = useState<NewsItem | null>(null)
   const [newsForm, setNewsForm] = useState({ title: '', content: '' })
-  const [configForm, setConfigForm] = useState({ serverIP: '', discordUrl: '' })
+  const [configForm, setConfigForm] = useState({
+    serverIP: '',
+    discordUrl: '',
+    modrinthUrl: '',
+    curseforgeUrl: ''
+  })
 
   // Fetch server stats
-  const { data: stats, refetch: refetchStats } = useQuery<ServerStats>({
+  const { data: stats } = useQuery<ServerStats>({
     queryKey: ['stats'],
     queryFn: async () => {
       const res = await fetch('/api/stats')
@@ -103,10 +118,31 @@ export default function Home() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['config'] })
-      toast({ title: 'Configuration updated!' })
+      toast({ title: 'Configuration mise à jour !' })
     },
     onError: () => {
-      toast({ title: 'Failed to update configuration', variant: 'destructive' })
+      toast({ title: 'Erreur lors de la mise à jour', variant: 'destructive' })
+    },
+  })
+
+  // Reset config mutation
+  const resetConfigMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch('/api/config', { method: 'DELETE' })
+      return res.json()
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['config'] })
+      setConfigForm({
+        serverIP: data.config.serverIP,
+        discordUrl: data.config.discordUrl,
+        modrinthUrl: data.config.modrinthUrl,
+        curseforgeUrl: data.config.curseforgeUrl
+      })
+      toast({ title: 'Configuration réinitialisée !' })
+    },
+    onError: () => {
+      toast({ title: 'Erreur lors de la réinitialisation', variant: 'destructive' })
     },
   })
 
@@ -123,10 +159,10 @@ export default function Home() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['news'] })
       setNewsForm({ title: '', content: '' })
-      toast({ title: 'News created!' })
+      toast({ title: 'Annonce créée !' })
     },
     onError: () => {
-      toast({ title: 'Failed to create news', variant: 'destructive' })
+      toast({ title: 'Erreur lors de la création', variant: 'destructive' })
     },
   })
 
@@ -144,10 +180,10 @@ export default function Home() {
       queryClient.invalidateQueries({ queryKey: ['news'] })
       setEditingNews(null)
       setNewsForm({ title: '', content: '' })
-      toast({ title: 'News updated!' })
+      toast({ title: 'Annonce mise à jour !' })
     },
     onError: () => {
-      toast({ title: 'Failed to update news', variant: 'destructive' })
+      toast({ title: 'Erreur lors de la mise à jour', variant: 'destructive' })
     },
   })
 
@@ -159,10 +195,10 @@ export default function Home() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['news'] })
-      toast({ title: 'News deleted!' })
+      toast({ title: 'Annonce supprimée !' })
     },
     onError: () => {
-      toast({ title: 'Failed to delete news', variant: 'destructive' })
+      toast({ title: 'Erreur lors de la suppression', variant: 'destructive' })
     },
   })
 
@@ -174,20 +210,17 @@ export default function Home() {
     },
     onSuccess: (data) => {
       toast({ 
-        title: 'Sync prepared!', 
+        title: 'Sync préparée !', 
         description: data.message 
       })
     },
     onError: () => {
-      toast({ title: 'Failed to sync', variant: 'destructive' })
+      toast({ title: 'Erreur lors de la sync', variant: 'destructive' })
     },
   })
 
-  // Initialize config form with default values, will be updated when admin edits
-  // The form uses the config values as initial state when the admin panel opens
-
-  const serverIP = config?.serverIP || 'minewar.ddns.net'
-  const discordUrl = config?.discordUrl || 'https://discord.gg/xHUGYn7ErC'
+  const serverIP = config?.serverIP || DEFAULT_CONFIG.serverIP
+  const discordUrl = config?.discordUrl || DEFAULT_CONFIG.discordUrl
 
   const copyIP = async () => {
     try {
@@ -201,7 +234,7 @@ export default function Home() {
     } catch {
       toast({
         title: "Erreur",
-        description: "Impossible de copier l'IP. Veuillez la copier manuellement.",
+        description: "Impossible de copier l'IP.",
         variant: "destructive",
       })
     }
@@ -215,18 +248,18 @@ export default function Home() {
     })
     
     if (result?.error) {
-      toast({ title: 'Invalid credentials', variant: 'destructive' })
+      toast({ title: 'Identifiants incorrects', variant: 'destructive' })
     } else {
       setLoginDialogOpen(false)
       setLoginForm({ username: '', password: '' })
-      toast({ title: 'Logged in successfully!' })
+      toast({ title: 'Connecté !' })
     }
   }
 
   const handleLogout = () => {
     signOut()
     setAdminPanelOpen(false)
-    toast({ title: 'Logged out' })
+    toast({ title: 'Déconnecté' })
   }
 
   const toggleNewsExpand = (id: string) => {
@@ -243,6 +276,18 @@ export default function Home() {
     })
   }
 
+  const openAdminPanel = (open: boolean) => {
+    setAdminPanelOpen(open)
+    if (open && config) {
+      setConfigForm({
+        serverIP: config.serverIP,
+        discordUrl: config.discordUrl,
+        modrinthUrl: config.modrinthUrl,
+        curseforgeUrl: config.curseforgeUrl
+      })
+    }
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#1a1a2e] via-[#16213e] to-[#0f3460]">
       {/* Stars background effect */}
@@ -254,15 +299,7 @@ export default function Home() {
       <div className="fixed top-2 right-2 z-50">
         {status === 'authenticated' ? (
           <div className="flex gap-2">
-            <Sheet open={adminPanelOpen} onOpenChange={(open) => {
-              setAdminPanelOpen(open)
-              if (open && config) {
-                setConfigForm({
-                  serverIP: config.serverIP,
-                  discordUrl: config.discordUrl,
-                })
-              }
-            }}>
+            <Sheet open={adminPanelOpen} onOpenChange={openAdminPanel}>
               <SheetTrigger asChild>
                 <Button 
                   variant="ghost" 
@@ -272,11 +309,11 @@ export default function Home() {
                   <Settings className="h-4 w-4" />
                 </Button>
               </SheetTrigger>
-              <SheetContent className="bg-[#1a1a2e] border-white/10 text-white w-[400px] sm:max-w-[400px]">
+              <SheetContent className="bg-[#1a1a2e] border-white/10 text-white w-[420px] sm:max-w-[420px]">
                 <SheetHeader>
                   <SheetTitle className="text-white flex items-center gap-2">
                     <Shield className="h-5 w-5 text-[#e94560]" />
-                    Admin Panel
+                    Panneau Admin
                   </SheetTitle>
                 </SheetHeader>
                 
@@ -284,11 +321,11 @@ export default function Home() {
                   <div className="space-y-6">
                     {/* Config Section */}
                     <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-[#feca57]">Site Configuration</h3>
+                      <h3 className="text-lg font-semibold text-[#feca57]">Configuration du Site</h3>
                       
                       <div className="space-y-3">
                         <div>
-                          <Label htmlFor="serverIP" className="text-gray-300">Server IP</Label>
+                          <Label htmlFor="serverIP" className="text-gray-300">IP du Serveur</Label>
                           <Input
                             id="serverIP"
                             value={configForm.serverIP}
@@ -298,7 +335,7 @@ export default function Home() {
                         </div>
                         
                         <div>
-                          <Label htmlFor="discordUrl" className="text-gray-300">Discord URL</Label>
+                          <Label htmlFor="discordUrl" className="text-gray-300">URL Discord</Label>
                           <Input
                             id="discordUrl"
                             value={configForm.discordUrl}
@@ -306,13 +343,56 @@ export default function Home() {
                             className="bg-white/5 border-white/10 text-white mt-1"
                           />
                         </div>
+                      </div>
+                    </div>
+
+                    <Separator className="bg-white/10" />
+
+                    {/* Download URLs Section */}
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold text-[#feca57] flex items-center gap-2">
+                        <Download className="h-5 w-5" />
+                        Liens de Téléchargement
+                      </h3>
+                      
+                      <div className="space-y-3">
+                        <div>
+                          <Label htmlFor="modrinthUrl" className="text-gray-300">URL Modrinth (.mrpack)</Label>
+                          <Input
+                            id="modrinthUrl"
+                            value={configForm.modrinthUrl}
+                            onChange={(e) => setConfigForm(prev => ({ ...prev, modrinthUrl: e.target.value }))}
+                            className="bg-white/5 border-white/10 text-white mt-1 text-sm"
+                          />
+                        </div>
                         
+                        <div>
+                          <Label htmlFor="curseforgeUrl" className="text-gray-300">URL CurseForge (.zip)</Label>
+                          <Input
+                            id="curseforgeUrl"
+                            value={configForm.curseforgeUrl}
+                            onChange={(e) => setConfigForm(prev => ({ ...prev, curseforgeUrl: e.target.value }))}
+                            className="bg-white/5 border-white/10 text-white mt-1 text-sm"
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="flex gap-2">
                         <Button 
                           onClick={() => updateConfigMutation.mutate(configForm)}
                           disabled={updateConfigMutation.isPending}
-                          className="w-full bg-[#e94560] hover:bg-[#e94560]/80"
+                          className="flex-1 bg-[#e94560] hover:bg-[#e94560]/80"
                         >
-                          {updateConfigMutation.isPending ? 'Saving...' : 'Save Configuration'}
+                          {updateConfigMutation.isPending ? 'Sauvegarde...' : 'Sauvegarder'}
+                        </Button>
+                        <Button 
+                          onClick={() => resetConfigMutation.mutate()}
+                          disabled={resetConfigMutation.isPending}
+                          variant="outline"
+                          className="border-[#feca57]/50 text-[#feca57] hover:bg-[#feca57]/10"
+                          title="Réinitialiser aux valeurs par défaut"
+                        >
+                          <RotateCcw className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
@@ -321,18 +401,18 @@ export default function Home() {
 
                     {/* News Management */}
                     <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-[#feca57]">News Management</h3>
+                      <h3 className="text-lg font-semibold text-[#feca57]">Gestion des Annonces</h3>
                       
                       {/* Add/Edit News Form */}
                       <div className="space-y-3 bg-white/5 p-4 rounded-lg">
                         <Input
-                          placeholder="News title"
+                          placeholder="Titre de l'annonce"
                           value={newsForm.title}
                           onChange={(e) => setNewsForm(prev => ({ ...prev, title: e.target.value }))}
                           className="bg-white/5 border-white/10 text-white"
                         />
                         <Textarea
-                          placeholder="News content"
+                          placeholder="Contenu de l'annonce..."
                           value={newsForm.content}
                           onChange={(e) => setNewsForm(prev => ({ ...prev, content: e.target.value }))}
                           className="bg-white/5 border-white/10 text-white min-h-[100px]"
@@ -349,7 +429,7 @@ export default function Home() {
                             disabled={createNewsMutation.isPending || updateNewsMutation.isPending || !newsForm.title || !newsForm.content}
                             className="flex-1 bg-[#1bd96a] hover:bg-[#1bd96a]/80 text-black"
                           >
-                            {editingNews ? 'Update' : 'Add'} News
+                            {editingNews ? 'Modifier' : 'Ajouter'}
                           </Button>
                           {editingNews && (
                             <Button 
@@ -401,7 +481,7 @@ export default function Home() {
                           </div>
                         ))}
                         {news?.length === 0 && (
-                          <p className="text-gray-400 text-center py-4">No news yet</p>
+                          <p className="text-gray-400 text-center py-4">Aucune annonce</p>
                         )}
                       </div>
                     </div>
@@ -412,14 +492,14 @@ export default function Home() {
                     <div className="space-y-3">
                       <h3 className="text-lg font-semibold text-[#feca57] flex items-center gap-2">
                         <Github className="h-5 w-5" />
-                        GitHub Sync
+                        Synchronisation GitHub
                       </h3>
                       <Button 
                         onClick={() => syncMutation.mutate()}
                         disabled={syncMutation.isPending}
                         className="w-full bg-[#5865F2] hover:bg-[#5865F2]/80"
                       >
-                        {syncMutation.isPending ? 'Syncing...' : 'Push to GitHub'}
+                        {syncMutation.isPending ? 'Sync en cours...' : 'Pousser vers GitHub'}
                       </Button>
                     </div>
 
@@ -432,7 +512,7 @@ export default function Home() {
                       className="w-full border-white/10 text-white hover:bg-white/5"
                     >
                       <LogOut className="h-4 w-4 mr-2" />
-                      Logout
+                      Déconnexion
                     </Button>
                   </div>
                 </ScrollArea>
@@ -452,11 +532,11 @@ export default function Home() {
             </DialogTrigger>
             <DialogContent className="bg-[#1a1a2e] border-white/10 text-white">
               <DialogHeader>
-                <DialogTitle className="text-white">Admin Login</DialogTitle>
+                <DialogTitle className="text-white">Connexion Admin</DialogTitle>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div>
-                  <Label htmlFor="username" className="text-gray-300">Username</Label>
+                  <Label htmlFor="username" className="text-gray-300">Nom d'utilisateur</Label>
                   <Input
                     id="username"
                     value={loginForm.username}
@@ -465,7 +545,7 @@ export default function Home() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="password" className="text-gray-300">Password</Label>
+                  <Label htmlFor="password" className="text-gray-300">Mot de passe</Label>
                   <Input
                     id="password"
                     type="password"
@@ -480,7 +560,7 @@ export default function Home() {
                   onClick={handleLogin}
                   className="bg-[#e94560] hover:bg-[#e94560]/80"
                 >
-                  Login
+                  Se connecter
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -532,13 +612,13 @@ export default function Home() {
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-white flex items-center gap-2">
                 <Activity className="h-5 w-5 text-[#e94560]" />
-                Server Status
+                Statut du Serveur
               </h3>
               <Badge 
                 variant={stats?.online ? "default" : "destructive"}
                 className={stats?.online ? "bg-[#1bd96a] hover:bg-[#1bd96a]" : ""}
               >
-                {stats?.online ? 'Online' : 'Offline'}
+                {stats?.online ? 'En ligne' : 'Hors ligne'}
               </Badge>
             </div>
             
@@ -548,7 +628,7 @@ export default function Home() {
                 <p className="text-2xl font-bold text-white">
                   {stats?.players?.online ?? 0}/{stats?.players?.max ?? 0}
                 </p>
-                <p className="text-xs text-gray-400">Players</p>
+                <p className="text-xs text-gray-400">Joueurs</p>
               </div>
               <div className="bg-white/5 rounded-lg p-3 text-center">
                 <Shield className="h-5 w-5 mx-auto mb-1 text-[#1bd96a]" />
@@ -561,7 +641,7 @@ export default function Home() {
             
             {stats?.players?.list && stats.players.list.length > 0 && (
               <div className="bg-white/5 rounded-lg p-3">
-                <p className="text-xs text-gray-400 mb-2">Online Players:</p>
+                <p className="text-xs text-gray-400 mb-2">Joueurs en ligne :</p>
                 <div className="flex flex-wrap gap-1">
                   {stats.players.list.slice(0, 10).map((player, i) => (
                     <Badge key={i} variant="outline" className="border-white/20 text-gray-300 text-xs">
@@ -570,7 +650,7 @@ export default function Home() {
                   ))}
                   {stats.players.list.length > 10 && (
                     <Badge variant="outline" className="border-white/20 text-gray-300 text-xs">
-                      +{stats.players.list.length - 10} more
+                      +{stats.players.list.length - 10} autres
                     </Badge>
                   )}
                 </div>

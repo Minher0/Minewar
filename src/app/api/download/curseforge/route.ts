@@ -1,8 +1,19 @@
 import { NextResponse } from 'next/server'
+import { db } from '@/lib/db'
 
-const GITHUB_RELEASE_URL = 'https://github.com/Minher0/Minewar/releases/latest/download/MineWar.zip'
+const DEFAULT_CURSEFORGE_URL = 'https://github.com/Minher0/Minewar/releases/latest/download/MineWar.zip'
 
 export async function GET() {
-  // Redirect directly to GitHub for better performance with large files
-  return NextResponse.redirect(GITHUB_RELEASE_URL)
+  try {
+    const config = await db.siteConfig.findUnique({
+      where: { id: 'main' }
+    })
+    
+    const downloadUrl = config?.curseforgeUrl || DEFAULT_CURSEFORGE_URL
+    return NextResponse.redirect(downloadUrl)
+  } catch (error) {
+    console.error('Error getting CurseForge URL:', error)
+    // Fallback to default URL
+    return NextResponse.redirect(DEFAULT_CURSEFORGE_URL)
+  }
 }

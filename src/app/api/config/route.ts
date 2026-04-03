@@ -3,6 +3,14 @@ import { db } from '@/lib/db'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 
+// Default configuration values
+const DEFAULT_CONFIG = {
+  serverIP: 'minewar.ddns.net',
+  discordUrl: 'https://discord.gg/xHUGYn7ErC',
+  modrinthUrl: 'https://github.com/Minher0/Minewar/releases/latest/download/MineWar.1.0.0.mrpack',
+  curseforgeUrl: 'https://github.com/Minher0/Minewar/releases/latest/download/MineWar.zip'
+}
+
 // GET - Get site config
 export async function GET() {
   try {
@@ -15,8 +23,7 @@ export async function GET() {
       config = await db.siteConfig.create({
         data: {
           id: 'main',
-          serverIP: 'minewar.ddns.net',
-          discordUrl: 'https://discord.gg/xHUGYn7ErC',
+          ...DEFAULT_CONFIG
         }
       })
     }
@@ -44,18 +51,22 @@ export async function PUT(request: NextRequest) {
     }
     
     const body = await request.json()
-    const { serverIP, discordUrl } = body
+    const { serverIP, discordUrl, modrinthUrl, curseforgeUrl } = body
     
     const config = await db.siteConfig.upsert({
       where: { id: 'main' },
       update: {
-        serverIP: serverIP || undefined,
-        discordUrl: discordUrl || undefined,
+        serverIP: serverIP ?? undefined,
+        discordUrl: discordUrl ?? undefined,
+        modrinthUrl: modrinthUrl ?? undefined,
+        curseforgeUrl: curseforgeUrl ?? undefined,
       },
       create: {
         id: 'main',
-        serverIP: serverIP || 'minewar.ddns.net',
-        discordUrl: discordUrl || 'https://discord.gg/xHUGYn7ErC',
+        serverIP: serverIP || DEFAULT_CONFIG.serverIP,
+        discordUrl: discordUrl || DEFAULT_CONFIG.discordUrl,
+        modrinthUrl: modrinthUrl || DEFAULT_CONFIG.modrinthUrl,
+        curseforgeUrl: curseforgeUrl || DEFAULT_CONFIG.curseforgeUrl,
       }
     })
     
@@ -64,6 +75,41 @@ export async function PUT(request: NextRequest) {
     console.error('Error updating config:', error)
     return NextResponse.json(
       { error: 'Failed to update config' },
+      { status: 500 }
+    )
+  }
+}
+
+// DELETE - Reset config to defaults (admin only)
+export async function DELETE() {
+  try {
+    const session = await getServerSession(authOptions)
+    
+    if (!session) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+    
+    const config = await db.siteConfig.upsert({
+      where: { id: 'main' },
+      update: DEFAULT_CONFIG,
+      create: {
+        id: 'main',
+        ...DEFAULT_CONFIG
+      }
+    })
+    
+    return NextResponse.json({
+      success: true,
+      message: 'Configuration reset to defaults',
+      config
+    })
+  } catch (error) {
+    console.error('Error resetting config:', error)
+    return NextResponse.json(
+      { error: 'Failed to reset config' },
       { status: 500 }
     )
   }
