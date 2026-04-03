@@ -78,14 +78,15 @@ export default function Home() {
     curseforgeUrl: ''
   })
 
-  // Fetch server stats
+  // Fetch server stats - auto refresh every 10 seconds
   const { data: stats } = useQuery<ServerStats>({
     queryKey: ['stats'],
     queryFn: async () => {
-      const res = await fetch('/api/stats')
+      const res = await fetch('/api/stats', { cache: 'no-store' })
       return res.json()
     },
-    refetchInterval: 30000, // Refresh every 30 seconds
+    refetchInterval: 10000, // Refresh every 10 seconds
+    staleTime: 5000, // Consider data stale after 5 seconds
   })
 
   // Fetch config

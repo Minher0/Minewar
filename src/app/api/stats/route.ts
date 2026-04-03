@@ -17,8 +17,9 @@ interface MinecraftServerStatus {
 async function pingMinecraftServer(host: string, port: number = 25565): Promise<MinecraftServerStatus | null> {
   try {
     // Use mcsrvstat.us API v3 which has better real-time detection
+    // Use no-store to always get fresh data
     const response = await fetch(`https://api.mcsrvstat.us/3/${host}:${port}`, {
-      next: { revalidate: 10 } // Cache for only 10 seconds for faster updates
+      cache: 'no-store'
     })
     
     if (!response.ok) {
@@ -61,33 +62,40 @@ async function pingMinecraftServer(host: string, port: number = 25565): Promise<
 // Default configuration fallback
 const DEFAULT_SERVER_IP = 'minewar.ddns.net'
 
+export const dynamic = 'force-dynamic' // Disable caching for this route
+
 export async function GET() {
   try {
     // Get server IP from environment or use default
-    // Note: In production with database, you'd fetch from config
     const serverIP = process.env.SERVER_IP || DEFAULT_SERVER_IP
     
     const status = await pingMinecraftServer(serverIP)
     
-    // If status is null (API error), return offline status
-    if (!status) {
-      return NextResponse.json({
-        online: false,
-        players: { online: 0, max: 0, list: [] },
-        version: { name: 'Fabric 1.20.1', protocol: 763 },
-        serverIP
-      })
+    // Create response with no-cache headers
+    const responseData = status ? { ...status, serverIP } : {
+      online: false,
+      players: { online: 0, max: 0, list: [] },
+      version: { name: 'Fabric 1.20.1', protocol: 763 },
+      serverIP
     }
     
-    return NextResponse.json({
-      ...status,
-      serverIP
+    return NextResponse.json(responseData, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
     })
   } catch (error) {
     console.error('Stats API error:', error)
     return NextResponse.json(
       { error: 'Failed to fetch server stats', online: false },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate'
+        }
+      }
     )
   }
 }
