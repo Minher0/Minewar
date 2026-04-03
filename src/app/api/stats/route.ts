@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { getConfig } from '@/lib/data-store'
 
 interface MinecraftServerStatus {
   online: boolean
@@ -16,8 +17,6 @@ interface MinecraftServerStatus {
 
 async function pingMinecraftServer(host: string, port: number = 25565): Promise<MinecraftServerStatus | null> {
   try {
-    // Use mcsrvstat.us API v3 which has better real-time detection
-    // Use no-store to always get fresh data
     const response = await fetch(`https://api.mcsrvstat.us/3/${host}:${port}`, {
       cache: 'no-store'
     })
@@ -29,8 +28,6 @@ async function pingMinecraftServer(host: string, port: number = 25565): Promise<
     
     const data = await response.json()
     
-    // The mcsrvstat.us API returns `online: true/false` directly
-    // Check this first and return offline status if server is not online
     if (data.online !== true) {
       return {
         online: false,
@@ -39,7 +36,6 @@ async function pingMinecraftServer(host: string, port: number = 25565): Promise<
       }
     }
     
-    // Server is online, return the data
     return {
       online: true,
       players: {
@@ -59,19 +55,15 @@ async function pingMinecraftServer(host: string, port: number = 25565): Promise<
   }
 }
 
-// Default configuration fallback
-const DEFAULT_SERVER_IP = 'minewar.ddns.net'
-
-export const dynamic = 'force-dynamic' // Disable caching for this route
+export const dynamic = 'force-dynamic'
 
 export async function GET() {
   try {
-    // Get server IP from environment or use default
-    const serverIP = process.env.SERVER_IP || DEFAULT_SERVER_IP
+    const config = await getConfig()
+    const serverIP = config.serverIP
     
     const status = await pingMinecraftServer(serverIP)
     
-    // Create response with no-cache headers
     const responseData = status ? { ...status, serverIP } : {
       online: false,
       players: { online: 0, max: 0, list: [] },
@@ -81,7 +73,7 @@ export async function GET() {
     
     return NextResponse.json(responseData, {
       headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
         'Pragma': 'no-cache',
         'Expires': '0'
       }
@@ -93,7 +85,7 @@ export async function GET() {
       { 
         status: 500,
         headers: {
-          'Cache-Control': 'no-store, no-cache, must-revalidate'
+          'Cache-Control': 'no-store'
         }
       }
     )

@@ -1,23 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { isDatabaseAvailable, getMemoryNews, addMemoryNews } from '@/lib/memory-store'
+import { getNews, addNews } from '@/lib/data-store'
+
+export const dynamic = 'force-dynamic'
 
 // GET - List all news
 export async function GET() {
   try {
-    const dbAvailable = await isDatabaseAvailable()
-    
-    if (dbAvailable) {
-      const { db } = await import('@/lib/db')
-      const news = await db.news.findMany({
-        orderBy: { createdAt: 'desc' }
-      })
-      return NextResponse.json(news)
-    } else {
-      // Return memory news when database is not available
-      return NextResponse.json(getMemoryNews())
-    }
+    const news = await getNews()
+    return NextResponse.json(news, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate'
+      }
+    })
   } catch (error) {
     console.error('Error fetching news:', error)
     return NextResponse.json([])
@@ -46,20 +42,8 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    const dbAvailable = await isDatabaseAvailable()
-    
-    if (dbAvailable) {
-      const { db } = await import('@/lib/db')
-      const news = await db.news.create({
-        data: { title, content }
-      })
-      
-      return NextResponse.json(news)
-    } else {
-      // Create in memory
-      const newsItem = addMemoryNews(title, content)
-      return NextResponse.json(newsItem)
-    }
+    const newsItem = await addNews(title, content)
+    return NextResponse.json(newsItem)
   } catch (error) {
     console.error('Error creating news:', error)
     return NextResponse.json(

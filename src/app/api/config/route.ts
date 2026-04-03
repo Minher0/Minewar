@@ -1,55 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { isDatabaseAvailable, getMemoryConfig, updateMemoryConfig, resetMemoryConfig } from '@/lib/memory-store'
-
-// Default configuration values
-const DEFAULT_CONFIG = {
-  serverIP: 'minewar.ddns.net',
-  discordUrl: 'https://discord.gg/xHUGYn7ErC',
-  modrinthUrl: 'https://github.com/Minher0/Minewar/releases/latest/download/MineWar.1.0.0.mrpack',
-  curseforgeUrl: 'https://github.com/Minher0/Minewar/releases/latest/download/MineWar.zip'
-}
+import { getConfig, updateConfig, resetConfig } from '@/lib/data-store'
 
 // GET - Get site config
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
-    const dbAvailable = await isDatabaseAvailable()
+    const config = await getConfig()
     
-    if (dbAvailable) {
-      const { db } = await import('@/lib/db')
-      let config = await db.siteConfig.findUnique({
-        where: { id: 'main' }
-      })
-      
-      // Create default config if not exists
-      if (!config) {
-        config = await db.siteConfig.create({
-          data: {
-            id: 'main',
-            ...DEFAULT_CONFIG
-          }
-        })
-      }
-      
-      return NextResponse.json(config)
-    } else {
-      // Return memory config when database is not available
-      const config = getMemoryConfig()
-      return NextResponse.json({
-        id: 'main',
-        ...config,
-        updatedAt: new Date().toISOString()
-      })
-    }
-  } catch (error) {
-    console.error('Error fetching config:', error)
-    // Return default config on error
     return NextResponse.json({
       id: 'main',
-      ...DEFAULT_CONFIG,
+      ...config,
       updatedAt: new Date().toISOString()
+    }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate'
+      }
     })
+  } catch (error) {
+    console.error('Error fetching config:', error)
+    return NextResponse.json(
+      { error: 'Failed to fetch config' },
+      { status: 500 }
+    )
   }
 }
 
@@ -68,43 +43,18 @@ export async function PUT(request: NextRequest) {
     const body = await request.json()
     const { serverIP, discordUrl, modrinthUrl, curseforgeUrl } = body
     
-    const dbAvailable = await isDatabaseAvailable()
+    const config = await updateConfig({
+      serverIP: serverIP || undefined,
+      discordUrl: discordUrl || undefined,
+      modrinthUrl: modrinthUrl || undefined,
+      curseforgeUrl: curseforgeUrl || undefined,
+    })
     
-    if (dbAvailable) {
-      const { db } = await import('@/lib/db')
-      const config = await db.siteConfig.upsert({
-        where: { id: 'main' },
-        update: {
-          serverIP: serverIP ?? undefined,
-          discordUrl: discordUrl ?? undefined,
-          modrinthUrl: modrinthUrl ?? undefined,
-          curseforgeUrl: curseforgeUrl ?? undefined,
-        },
-        create: {
-          id: 'main',
-          serverIP: serverIP || DEFAULT_CONFIG.serverIP,
-          discordUrl: discordUrl || DEFAULT_CONFIG.discordUrl,
-          modrinthUrl: modrinthUrl || DEFAULT_CONFIG.modrinthUrl,
-          curseforgeUrl: curseforgeUrl || DEFAULT_CONFIG.curseforgeUrl,
-        }
-      })
-      
-      return NextResponse.json(config)
-    } else {
-      // Update memory config
-      const config = updateMemoryConfig({
-        serverIP: serverIP || undefined,
-        discordUrl: discordUrl || undefined,
-        modrinthUrl: modrinthUrl || undefined,
-        curseforgeUrl: curseforgeUrl || undefined,
-      })
-      
-      return NextResponse.json({
-        id: 'main',
-        ...config,
-        updatedAt: new Date().toISOString()
-      })
-    }
+    return NextResponse.json({
+      id: 'main',
+      ...config,
+      updatedAt: new Date().toISOString()
+    })
   } catch (error) {
     console.error('Error updating config:', error)
     return NextResponse.json(
@@ -126,38 +76,17 @@ export async function DELETE() {
       )
     }
     
-    const dbAvailable = await isDatabaseAvailable()
+    const config = await resetConfig()
     
-    if (dbAvailable) {
-      const { db } = await import('@/lib/db')
-      const config = await db.siteConfig.upsert({
-        where: { id: 'main' },
-        update: DEFAULT_CONFIG,
-        create: {
-          id: 'main',
-          ...DEFAULT_CONFIG
-        }
-      })
-      
-      return NextResponse.json({
-        success: true,
-        message: 'Configuration reset to defaults',
-        config
-      })
-    } else {
-      // Reset memory config
-      const config = resetMemoryConfig()
-      
-      return NextResponse.json({
-        success: true,
-        message: 'Configuration reset to defaults',
-        config: {
-          id: 'main',
-          ...config,
-          updatedAt: new Date().toISOString()
-        }
-      })
-    }
+    return NextResponse.json({
+      success: true,
+      message: 'Configuration reset to defaults',
+      config: {
+        id: 'main',
+        ...config,
+        updatedAt: new Date().toISOString()
+      }
+    })
   } catch (error) {
     console.error('Error resetting config:', error)
     return NextResponse.json(
