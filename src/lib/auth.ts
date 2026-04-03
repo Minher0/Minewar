@@ -1,6 +1,22 @@
 import NextAuth, { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 
+// Generate a stable secret for production if not provided
+// In production, you should set NEXTAUTH_SECRET environment variable
+const getSecret = () => {
+  if (process.env.NEXTAUTH_SECRET) {
+    return process.env.NEXTAUTH_SECRET
+  }
+  // Fallback: generate a hash based on a stable value
+  // WARNING: In production, always set NEXTAUTH_SECRET in environment variables
+  if (process.env.NODE_ENV === 'production') {
+    console.warn('WARNING: NEXTAUTH_SECRET not set. Using fallback. Please set NEXTAUTH_SECRET environment variable.')
+    // Use a stable fallback based on the admin password hash
+    return 'minewar-secret-fallback-' + Buffer.from('admin:31122010').toString('base64')
+  }
+  return 'dev-secret-not-for-production'
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
@@ -43,7 +59,7 @@ export const authOptions: NextAuthOptions = {
       return session
     }
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: getSecret(),
 }
 
 const handler = NextAuth(authOptions)

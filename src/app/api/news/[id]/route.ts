@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { isDatabaseAvailable, updateMemoryNews, deleteMemoryNews } from '@/lib/memory-store'
 
 // PUT - Update news (admin only)
 export async function PUT(
@@ -29,12 +29,27 @@ export async function PUT(
       )
     }
     
-    const news = await db.news.update({
-      where: { id },
-      data: { title, content }
-    })
+    const dbAvailable = await isDatabaseAvailable()
     
-    return NextResponse.json(news)
+    if (dbAvailable) {
+      const { db } = await import('@/lib/db')
+      const news = await db.news.update({
+        where: { id },
+        data: { title, content }
+      })
+      
+      return NextResponse.json(news)
+    } else {
+      // Update in memory
+      const news = updateMemoryNews(id, title, content)
+      if (!news) {
+        return NextResponse.json(
+          { error: 'News not found' },
+          { status: 404 }
+        )
+      }
+      return NextResponse.json(news)
+    }
   } catch (error) {
     console.error('Error updating news:', error)
     return NextResponse.json(
@@ -61,11 +76,26 @@ export async function DELETE(
     
     const { id } = await params
     
-    await db.news.delete({
-      where: { id }
-    })
+    const dbAvailable = await isDatabaseAvailable()
     
-    return NextResponse.json({ success: true })
+    if (dbAvailable) {
+      const { db } = await import('@/lib/db')
+      await db.news.delete({
+        where: { id }
+      })
+      
+      return NextResponse.json({ success: true })
+    } else {
+      // Delete from memory
+      const success = deleteMemoryNews(id)
+      if (!success) {
+        return NextResponse.json(
+          { error: 'News not found' },
+          { status: 404 }
+        )
+      }
+      return NextResponse.json({ success: true })
+    }
   } catch (error) {
     console.error('Error deleting news:', error)
     return NextResponse.json(

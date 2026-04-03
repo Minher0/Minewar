@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/lib/db'
 
 interface MinecraftServerStatus {
   online: boolean
@@ -29,8 +28,9 @@ async function pingMinecraftServer(host: string, port: number = 25565): Promise<
     
     const data = await response.json()
     
-    // Check if server is actually online based on API response
-    if (!data.online) {
+    // The mcsrvstat.us API returns `online: true/false` directly
+    // Check this first and return offline status if server is not online
+    if (data.online !== true) {
       return {
         online: false,
         players: { online: 0, max: 0, list: [] },
@@ -38,6 +38,7 @@ async function pingMinecraftServer(host: string, port: number = 25565): Promise<
       }
     }
     
+    // Server is online, return the data
     return {
       online: true,
       players: {
@@ -57,21 +58,14 @@ async function pingMinecraftServer(host: string, port: number = 25565): Promise<
   }
 }
 
+// Default configuration fallback
+const DEFAULT_SERVER_IP = 'minewar.ddns.net'
+
 export async function GET() {
   try {
-    // Get server IP from config
-    let serverIP = 'minewar.ddns.net'
-    
-    try {
-      const config = await db.siteConfig.findUnique({
-        where: { id: 'main' }
-      })
-      if (config?.serverIP) {
-        serverIP = config.serverIP
-      }
-    } catch {
-      // Use default IP if config not found
-    }
+    // Get server IP from environment or use default
+    // Note: In production with database, you'd fetch from config
+    const serverIP = process.env.SERVER_IP || DEFAULT_SERVER_IP
     
     const status = await pingMinecraftServer(serverIP)
     
@@ -92,7 +86,7 @@ export async function GET() {
   } catch (error) {
     console.error('Stats API error:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch server stats' },
+      { error: 'Failed to fetch server stats', online: false },
       { status: 500 }
     )
   }
