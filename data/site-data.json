@@ -1,7 +1,7 @@
 {
   "config": {
     "serverIP": "minewar.ddns.net",
-    "discordUrl": "https://discord.gg/xHUGYn7ErC",
+    "discordUrl": "https://discord.gg/",
     "modrinthUrl": "https://github.com/Minher0/Minewar/releases/latest/download/MineWar.1.0.0.mrpack",
     "curseforgeUrl": "https://github.com/Minher0/Minewar/releases/latest/download/MineWar.zip"
   },
