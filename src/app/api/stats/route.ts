@@ -16,9 +16,9 @@ interface MinecraftServerStatus {
 
 async function pingMinecraftServer(host: string, port: number = 25565): Promise<MinecraftServerStatus | null> {
   try {
-    // Use mcsrvstat.us API which is free and reliable
-    const response = await fetch(`https://api.mcsrvstat.us/2/${host}:${port}`, {
-      next: { revalidate: 30 } // Cache for 30 seconds
+    // Use mcsrvstat.us API v3 which has better real-time detection
+    const response = await fetch(`https://api.mcsrvstat.us/3/${host}:${port}`, {
+      next: { revalidate: 10 } // Cache for only 10 seconds for faster updates
     })
     
     if (!response.ok) {
@@ -48,7 +48,7 @@ async function pingMinecraftServer(host: string, port: number = 25565): Promise<
       },
       version: {
         name: data.version || 'Fabric 1.20.1',
-        protocol: data.protocol || 763
+        protocol: data.protocol?.version || 763
       },
       motd: data.motd?.clean?.join('\n') || data.motd?.raw?.join('\n')
     }
