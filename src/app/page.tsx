@@ -794,7 +794,7 @@ export default function Home() {
         {/* Server Rules Section */}
         <div className="w-full max-w-3xl px-4 mt-12">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-6">
-            <span className="text-[#feca57]">⚔️ Règles du Serveur</span>
+            <span className="text-[#feca57]">⚔️ Règles du Serveur MineWar</span>
           </h2>
           <Card className="bg-white/10 backdrop-blur-lg border-white/20 shadow-2xl">
             <CardContent className="p-6 md:p-8">
@@ -826,6 +826,8 @@ export default function Home() {
                   <ul className="text-gray-300 space-y-1 ml-4">
                     <li>- Interdiction de grief ou de vol sur un terrain</li>
                     <li>- Exception : en cas de guerre déclarée entre 2 nations après 24h</li>
+                    <li>- Impossible de build dans un pays tant qu&apos;il n&apos;a pas été battu lors d&apos;une guerre</li>
+                    <li>- Le pays est récupéré par la nation ayant remporté la guerre</li>
                   </ul>
                 </div>
                 <div>
@@ -836,15 +838,22 @@ export default function Home() {
                   </ul>
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-[#feca57] mb-2">6. Sanctions</h3>
+                  <h3 className="text-lg font-bold text-[#feca57] mb-2">6. Pays & Nations</h3>
+                  <ul className="text-gray-300 space-y-1 ml-4">
+                    <li>- Chaque joueur a le droit à un pays gratuit au début</li>
+                    <li>- Les pays neutres sont payants : <span className="text-[#1bd96a] font-semibold">0.5€ par km²</span> de superficie</li>
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-[#feca57] mb-2">7. Sanctions</h3>
                   <ul className="text-gray-300 space-y-1 ml-4">
                     <li>- Jail ou ban selon la gravité</li>
-                    <li>- S&apos;échapper de prison sans autorisation entraînera un ban</li>
+                    <li>- S&apos;échapper de prison sans autorisation ou libération entraînera un ban</li>
                     <li>- Les décisions du staff sont finales</li>
                   </ul>
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-[#feca57] mb-2">7. Règle générale</h3>
+                  <h3 className="text-lg font-bold text-[#feca57] mb-2">8. Règle générale</h3>
                   <ul className="text-gray-300 space-y-1 ml-4">
                     <li>- Le bon sens est obligatoire</li>
                     <li>- Tout comportement nuisible peut être sanctionné</li>
@@ -852,14 +861,14 @@ export default function Home() {
                   </ul>
                 </div>
                 <div className="pt-4 border-t border-white/20">
-                  <h3 className="text-lg font-bold text-[#1bd96a] mb-3">📝 Commandes utiles</h3>
+                  <h3 className="text-lg font-bold text-[#1bd96a] mb-3">9. Commandes utiles</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-gray-300">
                     <div><code className="text-[#e94560]">/openpac-parties</code> - Gérer ou rejoindre une faction</div>
                     <div><code className="text-[#e94560]">/shop</code> - Ouvrir le shop</div>
                     <div><code className="text-[#e94560]">/spawn</code> - Retourner au spawn</div>
                     <div><code className="text-[#e94560]">/home set</code> - Définir un home</div>
                     <div><code className="text-[#e94560]">/home tp</code> - Se téléporter à son home</div>
-                    <div><code className="text-[#e94560]">/tpa</code> - Demander une téléportation</div>
+                    <div><code className="text-[#e94560]">/tpa</code> - Demander une téléportation à un joueur</div>
                   </div>
                 </div>
               </div>
