@@ -840,7 +840,7 @@ export default function Home() {
                 <div>
                   <h3 className="text-lg font-bold text-[#feca57] mb-2">6. Pays & Nations</h3>
                   <ul className="text-gray-300 space-y-1 ml-4">
-                    <li>- Chaque joueur a le droit à un pays gratuit au début</li>
+                    <li>- Chaque team a le droit à un pays gratuit au début</li>
                     <li>- Les pays neutres sont payants : <span className="text-[#1bd96a] font-semibold">0.5€ par km²</span> de superficie</li>
                   </ul>
                 </div>
