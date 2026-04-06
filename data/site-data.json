@@ -5,5 +5,13 @@
     "modrinthUrl": "https://github.com/Minher0/Minewar/releases/latest/download/MineWar.1.0.0.mrpack",
     "curseforgeUrl": "https://github.com/Minher0/Minewar/releases/latest/download/MineWar.zip"
   },
-  "news": []
+  "news": [
+    {
+      "id": "tv6g7bgu4ud",
+      "title": "Nouveau mods importants:",
+      "content": "https://cdn.modrinth.com/data/hBi3sdhJ/versions/BO4aN8WI/treps-cars-0.9-1.20.1.jar\nhttps://cdn.modrinth.com/data/8BmcQJ2H/versions/PdrSPr53/geckolib-fabric-1.20.1-4.8.3.jar",
+      "createdAt": "2026-04-06T10:16:12.115Z",
+      "updatedAt": "2026-04-06T10:16:12.115Z"
+    }
+  ]
 }
